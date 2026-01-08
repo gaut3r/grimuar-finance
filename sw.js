@@ -1,4 +1,4 @@
-const CACHE_NAME = "grimuar-cache-v3;
+const CACHE_NAME = "grimuar-cache-v4;
 const CORE_ASSETS = [
   "./",
   "./index.html",
@@ -46,5 +46,6 @@ self.addEventListener("fetch", (event) => {
     })
   );
 });
+
 
 
