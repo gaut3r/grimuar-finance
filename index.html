@@ -2,10 +2,8 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>Мои финансы</title>
+  <title>Гримуар Финансов</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="manifest" href="manifest.webmanifest">
-  <meta name="theme-color" content="#0b1220">
 
   <!-- Шрифты -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,6 +12,10 @@
     href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@500;600;700&display=swap"
     rel="stylesheet"
   />
+
+  <!-- PWA манифест -->
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#0b1220">
 
   <style>
     * { box-sizing: border-box; }
@@ -24,9 +26,10 @@
       background:
         radial-gradient(circle at top, #4c1d95 0, rgba(15,23,42,0.95) 40%, #020617 80%);
       color: #e5e7eb;
+      min-height: 100vh;
     }
 
-    /* Немного "космического тумана" поверх */
+    /* Космический туман */
     body::before {
       content: "";
       position: fixed;
@@ -55,6 +58,8 @@
       flex-direction: column;
       padding: 16px;
       gap: 12px;
+      position: relative;
+      z-index: 1;
     }
 
     header {
@@ -442,10 +447,119 @@
     @media (max-width: 360px) {
       .top-row { grid-template-columns: 1fr; }
     }
+
+    /* 🔮 Анимированный splash-экран */
+    .splash {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background:
+        radial-gradient(circle at top, #4c1d95 0, rgba(15,23,42,0.98) 40%, #020617 80%);
+      z-index: 999;
+      overflow: hidden;
+      transition: opacity 0.7s ease-out;
+    }
+
+    .splash-hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .splash-orb {
+      width: 120px;
+      height: 120px;
+      border-radius: 999px;
+      border: 2px solid rgba(196,181,253,0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      box-shadow:
+        0 0 25px rgba(129, 140, 248, 0.7),
+        0 0 60px rgba(56, 189, 248, 0.4);
+      animation: orbPulse 2.3s ease-in-out infinite;
+    }
+
+    .splash-orb::before {
+      content: "";
+      position: absolute;
+      inset: 10px;
+      border-radius: inherit;
+      border: 1px dashed rgba(165,180,252,0.8);
+      animation: orbSpin 9s linear infinite;
+      opacity: 0.8;
+    }
+
+    .splash-orb-inner {
+      width: 70px;
+      height: 70px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 20%, #facc15, #f97316 40%, #4c1d95 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #020617;
+      font-family: "Playfair Display", serif;
+      font-weight: 700;
+      font-size: 32px;
+      text-shadow: 0 0 8px rgba(253,224,71,0.7);
+    }
+
+    .splash-title {
+      margin-top: 16px;
+      font-family: "Playfair Display", serif;
+      font-size: 22px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #e5e7ff;
+      text-shadow: 0 0 8px rgba(129,140,248,0.7);
+      text-align: center;
+    }
+
+    .splash-subtitle {
+      margin-top: 6px;
+      font-size: 13px;
+      color: #c7d2fe;
+      opacity: 0.9;
+      text-align: center;
+    }
+
+    .splash-hint {
+      position: absolute;
+      bottom: 28px;
+      font-size: 11px;
+      color: #9ca3af;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    @keyframes orbPulse {
+      0%   { transform: scale(1); box-shadow: 0 0 20px rgba(129, 140, 248, 0.6); }
+      50%  { transform: scale(1.06); box-shadow: 0 0 35px rgba(129, 140, 248, 0.9); }
+      100% { transform: scale(1); box-shadow: 0 0 20px rgba(129, 140, 248, 0.6); }
+    }
+
+    @keyframes orbSpin {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
   </style>
 </head>
 
 <body>
+  <!-- 🔮 Splash-экран -->
+  <div id="splash" class="splash">
+    <div class="splash-orb">
+      <div class="splash-orb-inner">G</div>
+    </div>
+    <div class="splash-title">Гримуар Финансов</div>
+    <div class="splash-subtitle">Пробуждение магии денег...</div>
+    <div class="splash-hint">подготовка свитков и таблиц</div>
+  </div>
+
   <div class="app">
     <header>
       <h1>Личный гримуар финансов</h1>
@@ -788,7 +902,7 @@
           barPair.className = "chart-bar-pair";
 
           const bar = document.createElement("div");
-          bar.className = "chart-bar-income"; // для категорий просто один бар
+          bar.className = "chart-bar-income";
           const percent = maxVal ? (val / maxVal) * 100 : 0;
           requestAnimationFrame(() => {
             bar.style.width = `${percent}%`;
@@ -811,7 +925,6 @@
         });
     }
 
-    // Новый график: доходы vs расходы по дням
     function renderDayOverlapChart(byDateExp, byDateInc) {
       const chartEl = document.getElementById("chartDays");
       chartEl.innerHTML = "";
@@ -923,6 +1036,7 @@
         if (budgetWarnings.length) {
           hintEl.innerHTML = budgetWarnings.join("<br>");
         }
+        hideSplash();
         return;
       }
 
@@ -1119,6 +1233,8 @@
 
       renderCategoryChart(byCategory, totalExpenses);
       renderDayOverlapChart(byDateExp, byDateInc);
+
+      hideSplash();
     }
 
     function autoKindByCategory() {
@@ -1206,6 +1322,22 @@
         render();
       }
     }
+
+    // 🔮 скрыть splash после загрузки/рендера
+    function hideSplash() {
+      const splash = document.getElementById("splash");
+      if (!splash) return;
+      // чуть подержим, чтобы анимация успела «сыграть»
+      setTimeout(() => {
+        splash.classList.add("splash-hidden");
+        setTimeout(() => {
+          if (splash && splash.parentNode) {
+            splash.parentNode.removeChild(splash);
+          }
+        }, 800);
+      }, 400);
+    }
+
     // Регистрация service worker для PWA
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
